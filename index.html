@@ -8,8 +8,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>NJOB - KRAMSKO MODIVO</title>
 
-    <link rel="icon" type="image/png" href="Njob.png">
-    <link rel="apple-touch-icon" href="Njob.png">
+    <link rel="icon" type="image/png" href="njob.png">
+    <link rel="apple-touch-icon" href="njob.png">
 
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDEq-AGhrBol0dkthbxNiH9MwSY-BMrD9s&libraries=geometry,directions"></script>
 
@@ -17,13 +17,9 @@
         :root { --bg: #000; --card: #1e293b; --blue: #38bdf8; --green: #22c55e; --red: #ef4444; --gold: #fbbf24; }
         body { font-family: sans-serif; background: var(--bg); color: white; margin: 0; padding: 10px; display: flex; flex-direction: column; height: 100vh; box-sizing: border-box; overflow: hidden; transition: background-color 0.1s; position: relative; }
         
-        /* EKRAN STARTOWY */
         #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
-        
-        /* Twoja ikona na ekranie startowym */
         .splash-logo { width: 120px; height: 120px; background: #555; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; border: 2px solid var(--blue); overflow: hidden; }
         .splash-logo img { width: 100%; height: 100%; object-fit: cover; }
-
         #splash h1 { color: var(--blue); font-size: 2.2rem; font-weight: 900; margin-bottom: 5px; letter-spacing: 3px; }
         .btn-start { background: transparent; color: var(--blue); border: 3px solid var(--blue); padding: 18px 70px; border-radius: 50px; font-size: 1.5rem; font-weight: 900; box-shadow: 0 0 20px rgba(56, 189, 248, 0.4); cursor: pointer; }
 
@@ -75,7 +71,7 @@
             <div id="timer">--</div>
             <div class="gps-sub" id="gps-timer">--</div>
         </div>
-        <div id="gps-msg">GPS: Oczekiwanie...</div>
+        <div id="gps-msg">GPS: Szukam sygnału...</div>
     </div>
 
     <div id="map"></div>
@@ -86,7 +82,6 @@
     </div>
 
 <script>
-    // Reszta skryptu pozostaje bez zmian jak w wersji V41
     var schedules = {
         "04:55": [ { "n": "NOWE KRAMSKO", "t": "04:55", "la": 52.140333, "ln": 15.770250 }, { "n": "MODIVO - EOBUWIE", "t": "---", "la": 51.916250, "ln": 15.626250 } ],
         "09:05": [ { "n": "NOWE KRAMSKO", "t": "09:05", "la": 52.140333, "ln": 15.770250 }, { "n": "MODIVO - EOBUWIE", "t": "---", "la": 51.916250, "ln": 15.626250 } ],
@@ -193,8 +188,17 @@
 
     function calc() {
         if(!userPos || !ds) return;
-        ds.route({ origin: userPos, destination: {lat: schedules[curr][idx].la, lng: schedules[curr][idx].ln}, travelMode: 'DRIVING' }, (res, stat) => {
-            if(stat === 'OK') { dr.setDirections(res); liveDelay = Math.round(res.routes[0].legs[0].duration.value / 60); }
+        ds.route({ 
+            origin: userPos, 
+            destination: {lat: schedules[curr][idx].la, lng: schedules[curr][idx].ln}, 
+            travelMode: google.maps.TravelMode.DRIVING 
+        }, (res, stat) => {
+            if(stat === 'OK') { 
+                dr.setDirections(res); 
+                let baseMin = res.routes[0].legs[0].duration.value / 60;
+                // --- NOWY WSPÓŁCZYNNIK: 1.16 ---
+                liveDelay = Math.round(baseMin * 1.16); 
+            }
         });
     }
 
@@ -252,4 +256,3 @@
 </script>
 </body>
 </html>
-
