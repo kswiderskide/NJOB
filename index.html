@@ -3,25 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>NJOB - KRAMSKO MODIVO</title>
+    
+    <title>NJOB</title>
 
     <link rel="icon" type="image/png" href="njob.png">
     <link rel="apple-touch-icon" href="njob.png">
+    <link rel="manifest" href='data:application/manifest+json,{"name":"NJOB Navigation","short_name":"NJOB","start_url":".","display":"standalone","background_color":"#000000","theme_color":"#000000","icons":[{"src":"njob.png","sizes":"192x192","type":"image/png"}]}'>
 
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDEq-AGhrBol0dkthbxNiH9MwSY-BMrD9s&libraries=geometry,directions"></script>
 
     <style>
         :root { --bg: #000; --card: #1e293b; --blue: #38bdf8; --green: #22c55e; --red: #ef4444; --gold: #fbbf24; }
-        body { font-family: sans-serif; background: var(--bg); color: white; margin: 0; padding: 10px; display: flex; flex-direction: column; height: 100vh; box-sizing: border-box; overflow: hidden; transition: background-color 0.1s; position: relative; }
+        body { font-family: sans-serif; background: var(--bg); color: white; margin: 0; padding: 10px; display: flex; flex-direction: column; height: 100vh; box-sizing: border-box; overflow: hidden; position: relative; }
         
-        #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
-        .splash-logo { width: 120px; height: 120px; background: #555; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; border: 2px solid var(--blue); overflow: hidden; }
-        .splash-logo img { width: 100%; height: 100%; object-fit: cover; }
-        #splash h1 { color: var(--blue); font-size: 2.2rem; font-weight: 900; margin-bottom: 5px; letter-spacing: 3px; }
-        .btn-start { background: transparent; color: var(--blue); border: 3px solid var(--blue); padding: 18px 70px; border-radius: 50px; font-size: 1.5rem; font-weight: 900; box-shadow: 0 0 20px rgba(56, 189, 248, 0.4); cursor: pointer; }
+        /* EKRAN STARTOWY - BEZ IKONY */
+        #splash { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: #000; z-index: 999; display: flex; 
+            flex-direction: column; align-items: center; justify-content: center; 
+            transition: opacity 0.5s; 
+        }
+        #splash h1 { 
+            color: var(--blue); font-size: 3rem; font-weight: 900; 
+            margin-bottom: 40px; letter-spacing: 6px; 
+            text-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+        }
+        .btn-start { 
+            background: transparent; color: var(--blue); border: 3px solid var(--blue); 
+            padding: 20px 80px; border-radius: 50px; font-size: 1.6rem; 
+            font-weight: 900; box-shadow: 0 0 15px rgba(56, 189, 248, 0.4); 
+            cursor: pointer; 
+        }
 
         .btn-exit-x { position: absolute; top: 15px; right: 15px; width: 44px; height: 44px; background: var(--red); color: white; border: 2px solid white; border-radius: 50%; font-size: 28px; font-weight: bold; display: flex; align-items: center; justify-content: center; z-index: 1000; cursor: pointer; }
 
@@ -41,7 +53,7 @@
         #gps-msg { color: var(--gold); font-weight: bold; font-size: 1rem; }
         #map { flex: 1; width: 100%; border-radius: 15px; background: #111; margin-bottom: 15px; border: 2px solid var(--blue); }
 
-        .footer { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; height: 70px; margin-bottom: 35px; flex-shrink: 0; }
+        .footer { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; height: 70px; margin-bottom: 40px; flex-shrink: 0; }
         .btn-nav { background: var(--card); color: white; border: 1px solid #444; border-radius: 12px; font-size: 1rem; font-weight: bold; text-transform: uppercase; }
         #btn-next { color: var(--blue); border-color: var(--blue); }
         
@@ -51,9 +63,6 @@
 <body>
 
     <div id="splash">
-        <div class="splash-logo">
-            <img src="njob.png" alt="NJOB Logo">
-        </div>
         <h1>NJOB</h1>
         <button class="btn-start" onclick="startApp()">START</button>
     </div>
@@ -71,7 +80,7 @@
             <div id="timer">--</div>
             <div class="gps-sub" id="gps-timer">--</div>
         </div>
-        <div id="gps-msg">GPS: Szukam sygnału...</div>
+        <div id="gps-msg">GPS: Oczekiwanie...</div>
     </div>
 
     <div id="map"></div>
@@ -97,18 +106,20 @@
         var doc = document.documentElement;
         if (doc.requestFullscreen) doc.requestFullscreen();
         else if (doc.webkitRequestFullscreen) doc.webkitRequestFullscreen();
+        
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         const ctx = new AudioContext();
+        
         document.getElementById('splash').style.opacity = '0';
         setTimeout(() => { document.getElementById('splash').style.display = 'none'; }, 500);
+        
         renderNav(); refresh(); initMap(); initGPS(); setInterval(refresh, 1000);
     }
 
     function exitApp() {
-        if(confirm("Czy na pewno chcesz zamknąć aplikację?")) {
-            window.close();
-            setTimeout(() => { window.location.href = "about:blank"; }, 300);
-        }
+        if (document.exitFullscreen) document.exitFullscreen().catch(()=>{});
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen().catch(()=>{});
+        if(confirm("Zakończyć trasę?")) { location.reload(); }
     }
 
     function formatClock(totalMin) {
@@ -188,15 +199,11 @@
 
     function calc() {
         if(!userPos || !ds) return;
-        ds.route({ 
-            origin: userPos, 
-            destination: {lat: schedules[curr][idx].la, lng: schedules[curr][idx].ln}, 
-            travelMode: google.maps.TravelMode.DRIVING 
-        }, (res, stat) => {
+        ds.route({ origin: userPos, destination: {lat: schedules[curr][idx].la, lng: schedules[curr][idx].ln}, travelMode: google.maps.TravelMode.DRIVING }, (res, stat) => {
             if(stat === 'OK') { 
                 dr.setDirections(res); 
                 let baseMin = res.routes[0].legs[0].duration.value / 60;
-                // --- NOWY WSPÓŁCZYNNIK: 1.16 ---
+                // Współczynnik dla autobusu (1.16)
                 liveDelay = Math.round(baseMin * 1.16); 
             }
         });
