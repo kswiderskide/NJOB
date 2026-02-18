@@ -2,13 +2,13 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <title>NJOB</title>
 
     <link rel="icon" type="image/png" href="njob.png">
     <link rel="apple-touch-icon" href="njob.png">
-    <link rel="manifest" href='data:application/manifest+json,{"name":"NJOB Navigation","short_name":"NJOB","start_url":".","display":"standalone","background_color":"#000000","theme_color":"#000000","icons":[{"src":"njob.png","sizes":"192x192","type":"image/png"}]}'>
+    <link rel="manifest" href='data:application/manifest+json,{"name":"NJOB","short_name":"NJOB","start_url":".","display":"standalone","background_color":"#000000","theme_color":"#000000","icons":[{"src":"njob.png","sizes":"192x192","type":"image/png"}]}'>
 
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDEq-AGhrBol0dkthbxNiH9MwSY-BMrD9s&libraries=geometry,directions"></script>
 
@@ -16,7 +16,7 @@
         :root { --bg: #000; --card: #1e293b; --blue: #38bdf8; --green: #22c55e; --red: #ef4444; --gold: #fbbf24; }
         body { font-family: sans-serif; background: var(--bg); color: white; margin: 0; padding: 10px; display: flex; flex-direction: column; height: 100vh; box-sizing: border-box; overflow: hidden; position: relative; }
         
-        /* EKRAN STARTOWY - BEZ IKONY */
+        /* EKRAN STARTOWY - NJOB NA SZARYM TLE */
         #splash { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: #000; z-index: 999; display: flex; 
@@ -24,19 +24,17 @@
             transition: opacity 0.5s; 
         }
         #splash h1 { 
-            color: var(--blue); font-size: 3rem; font-weight: 900; 
-            margin-bottom: 40px; letter-spacing: 6px; 
-            text-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+            color: #ddd; font-size: 3.5rem; font-weight: 900; 
+            margin-bottom: 50px; letter-spacing: 8px; 
+            background: #444; padding: 20px 40px; border-radius: 20px;
         }
         .btn-start { 
             background: transparent; color: var(--blue); border: 3px solid var(--blue); 
             padding: 20px 80px; border-radius: 50px; font-size: 1.6rem; 
-            font-weight: 900; box-shadow: 0 0 15px rgba(56, 189, 248, 0.4); 
-            cursor: pointer; 
+            font-weight: 900; cursor: pointer; 
         }
 
         .btn-exit-x { position: absolute; top: 15px; right: 15px; width: 44px; height: 44px; background: var(--red); color: white; border: 2px solid white; border-radius: 50%; font-size: 28px; font-weight: bold; display: flex; align-items: center; justify-content: center; z-index: 1000; cursor: pointer; }
-
         .bright-flash { background-color: rgba(255, 255, 255, 0.9) !important; }
 
         .nav-label { font-size: 1rem; color: var(--blue); font-weight: 900; margin: 5px 0 2px 0; text-transform: uppercase; }
@@ -107,8 +105,7 @@
         if (doc.requestFullscreen) doc.requestFullscreen();
         else if (doc.webkitRequestFullscreen) doc.webkitRequestFullscreen();
         
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        const ctx = new AudioContext();
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
         
         document.getElementById('splash').style.opacity = '0';
         setTimeout(() => { document.getElementById('splash').style.display = 'none'; }, 500);
@@ -203,7 +200,7 @@
             if(stat === 'OK') { 
                 dr.setDirections(res); 
                 let baseMin = res.routes[0].legs[0].duration.value / 60;
-                // Współczynnik dla autobusu (1.16)
+                // Współczynnik dla Twojego autobusu: 1.16
                 liveDelay = Math.round(baseMin * 1.16); 
             }
         });
