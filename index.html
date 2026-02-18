@@ -12,30 +12,62 @@
 
     <style>
         :root { --bg: #000; --card: #1e293b; --blue: #38bdf8; --green: #22c55e; --red: #ef4444; --gold: #fbbf24; }
-        body { font-family: sans-serif; background: var(--bg); color: white; margin: 0; padding: 10px; display: flex; flex-direction: column; height: 100vh; box-sizing: border-box; overflow: hidden; transition: background-color 0.1s; }
+        body { font-family: sans-serif; background: var(--bg); color: white; margin: 0; padding: 10px; display: flex; flex-direction: column; height: 100vh; box-sizing: border-box; overflow: hidden; transition: background-color 0.1s; position: relative; }
         
+        /* EKRAN STARTOWY */
         #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
         #splash h1 { color: var(--blue); font-size: 2.2rem; font-weight: 900; margin-bottom: 5px; letter-spacing: 3px; text-shadow: 0 0 15px rgba(56,189,248,0.6); }
         #splash p { color: var(--gold); font-weight: bold; margin-bottom: 50px; font-size: 0.9rem; letter-spacing: 1px; }
-        .btn-start { background: transparent; color: var(--blue); border: 3px solid var(--blue); padding: 20px 80px; border-radius: 50px; font-size: 1.6rem; font-weight: 900; box-shadow: 0 0 20px rgba(56, 189, 248, 0.4), inset 0 0 15px rgba(56, 189, 248, 0.2); cursor: pointer; transition: 0.3s; }
+        .btn-start { background: transparent; color: var(--blue); border: 3px solid var(--blue); padding: 20px 80px; border-radius: 50px; font-size: 1.6rem; font-weight: 900; box-shadow: 0 0 20px rgba(56, 189, 248, 0.4), inset 0 0 15px rgba(56, 189, 248, 0.2); cursor: pointer; }
+
+        /* PRZYCISK ZAKOŃCZ (WYJŚCIE) */
+        .btn-exit-x {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 44px;
+            height: 44px;
+            background: var(--red);
+            color: white;
+            border: 2px solid white;
+            border-radius: 50%;
+            font-size: 28px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.6);
+            cursor: pointer;
+        }
 
         .bright-flash { background-color: rgba(255, 255, 255, 0.9) !important; }
 
-        .nav-label { font-size: 1.1rem; color: var(--blue); font-weight: 900; margin: 8px 0 4px 0; text-transform: uppercase; letter-spacing: 1px; }
-        .nav-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; flex-shrink: 0; min-height: 50px; }
-        .btn-s { background: var(--card); color: #fff; border: 1px solid #444; padding: 12px 18px; border-radius: 10px; font-weight: bold; font-size: 1rem; min-width: 90px; }
+        .nav-label { font-size: 1rem; color: var(--blue); font-weight: 900; margin: 5px 0 2px 0; text-transform: uppercase; letter-spacing: 1px; }
+        .nav-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; flex-shrink: 0; min-height: 45px; margin-right: 55px; }
+        .btn-s { background: var(--card); color: #fff; border: 1px solid #444; padding: 10px 14px; border-radius: 8px; font-weight: bold; font-size: 0.9rem; min-width: 80px; }
         .btn-s.active { background: var(--blue); color: black; border-color: white; box-shadow: 0 0 10px var(--blue); }
 
-        .display { background: var(--card); border: 2px solid #334155; border-radius: 20px; padding: 15px; text-align: center; margin-bottom: 8px; flex-shrink: 0; position: relative; }
-        #stop-name { color: var(--blue); font-size: 1.4rem; font-weight: 900; margin: 0; text-transform: uppercase; }
-        .timer-container { display: flex; justify-content: center; align-items: baseline; gap: 15px; margin: 5px 0; }
-        #timer { font-size: 3.5rem; font-weight: 900; color: var(--green); white-space: nowrap; }
-        .gps-sub { font-size: 1.6rem; font-weight: 900; color: var(--blue); opacity: 0.9; }
+        .display { background: var(--card); border: 2px solid #334155; border-radius: 20px; padding: 12px; text-align: center; margin-bottom: 8px; flex-shrink: 0; position: relative; }
+        #stop-name { color: var(--blue); font-size: 1.3rem; font-weight: 900; margin: 0; text-transform: uppercase; }
+        .timer-container { display: flex; justify-content: center; align-items: baseline; gap: 12px; margin: 4px 0; }
+        #timer { font-size: 3.2rem; font-weight: 900; color: var(--green); white-space: nowrap; }
+        .gps-sub { font-size: 1.5rem; font-weight: 900; color: var(--blue); opacity: 0.9; }
 
-        #gps-msg { color: var(--gold); font-weight: bold; font-size: 1.1rem; }
-        #map { flex: 1; width: 100%; border-radius: 15px; background: #111; margin-bottom: 8px; border: 2px solid var(--blue); }
-        .footer { display: flex; gap: 10px; height: 75px; margin-bottom: 5px; flex-shrink: 0; }
-        .btn-nav { flex: 1; background: var(--card); color: white; border: 1px solid #444; border-radius: 15px; font-size: 1.2rem; font-weight: bold; }
+        #gps-msg { color: var(--gold); font-weight: bold; font-size: 1rem; }
+        #map { flex: 1; width: 100%; border-radius: 15px; background: #111; margin-bottom: 15px; border: 2px solid var(--blue); }
+
+        .footer { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 12px; 
+            height: 70px; 
+            margin-bottom: 35px; /* Podniesienie przycisków */
+            flex-shrink: 0; 
+        }
+        .btn-nav { background: var(--card); color: white; border: 1px solid #444; border-radius: 12px; font-size: 1rem; font-weight: bold; text-transform: uppercase; }
+        #btn-next { color: var(--blue); border-color: var(--blue); }
+        
         button:active { opacity: 0.7; }
     </style>
 </head>
@@ -46,6 +78,8 @@
         <p>SYSTEM NAWIGACJI</p>
         <button class="btn-start" onclick="startApp()">START</button>
     </div>
+
+    <button class="btn-exit-x" onclick="exitApp()">×</button>
 
     <div class="nav-label">🔵 WYJAZDY:</div>
     <div class="nav-row" id="work-bar"></div>
@@ -64,8 +98,8 @@
     <div id="map"></div>
 
     <div class="footer">
-        <button class="btn-nav" onclick="move(-1)">POPRZEDNI</button>
-        <button class="btn-nav" id="btn-next" onclick="handleStep()" style="color:var(--blue); border-color:var(--blue);">NASTĘPNY</button>
+        <button class="btn-nav" onclick="move(-1)">Wstecz</button>
+        <button class="btn-nav" id="btn-next" onclick="handleStep()">Dalej</button>
     </div>
 
 <script>
@@ -78,8 +112,7 @@
     };
 
     var curr = "04:55", idx = 0, map, ds, dr, userPos, liveDelay = 0;
-    var lastAlertPoint = "", lastAlertTime = 0, alarmRepetitionCount = 0;
-    var lastSirenTime = 0;
+    var lastAlertPoint = "", lastAlertTime = 0, alarmRepetitionCount = 0, lastSirenTime = 0;
 
     function startApp() {
         var doc = document.documentElement;
@@ -93,6 +126,17 @@
         setTimeout(() => { document.getElementById('splash').style.display = 'none'; }, 500);
         
         renderNav(); refresh(); initMap(); initGPS(); setInterval(refresh, 1000);
+    }
+
+    // FUNKCJA WYJŚCIA Z APLIKACJI
+    function exitApp() {
+        if(confirm("Czy na pewno chcesz zamknąć aplikację?")) {
+            window.close(); // Próba zamknięcia zakładki
+            setTimeout(() => {
+                // Jeśli window.close nie zadziałało, idź do pustej strony
+                window.location.href = "about:blank";
+            }, 300);
+        }
     }
 
     function formatClock(totalMin) {
@@ -183,7 +227,7 @@
         let tEl = document.getElementById('timer');
         let gtEl = document.getElementById('gps-timer');
         gtEl.innerText = formatClock(liveDelay);
-        document.getElementById('btn-next').innerText = (idx >= 1) ? "ZAKOŃCZ ✅" : "NASTĘPNY";
+        document.getElementById('btn-next').innerText = (idx >= 1) ? "Zakończ" : "Dalej";
 
         if(s.t === "---") {
             let n = new Date(); n.setMinutes(n.getMinutes() + liveDelay);
@@ -198,17 +242,13 @@
             tEl.style.color = (diff < 0) ? "var(--red)" : "var(--green)";
             let zap = diff - liveDelay;
             document.getElementById('gps-msg').innerText = "ZAPAS: " + formatClock(zap);
-            
-            let alertID = curr + "_" + idx;
-            let now = Date.now();
+            let alertID = curr + "_" + idx; let now = Date.now();
             if (userPos) {
-                if (zap === 1 && (now - lastSirenTime > 60000)) {
-                    triggerSiren(); lastSirenTime = now;
-                } else if (zap <= 5 && zap > 1 && (now - lastAlertTime >= 60000)) {
-                    if (lastAlertPoint !== alertID) alarmRepetitionCount = 0;
-                    else alarmRepetitionCount++;
-                    let vol = Math.min(0.2 + (alarmRepetitionCount * 0.2), 1.0);
-                    triggerPips(vol); lastAlertPoint = alertID; lastAlertTime = now;
+                if (zap === 1 && (now - lastSirenTime > 60000)) { triggerSiren(); lastSirenTime = now; }
+                else if (zap <= 5 && zap > 1 && (now - lastAlertTime >= 60000)) {
+                    if (lastAlertPoint !== alertID) alarmRepetitionCount = 0; else alarmRepetitionCount++;
+                    let vol = Math.min(0.2 + (alarmRepetitionCount * 0.2), 1.0); triggerPips(vol);
+                    lastAlertPoint = alertID; lastAlertTime = now;
                 }
             }
         }
@@ -217,7 +257,7 @@
     function handleStep() {
         if (idx >= 1) {
             if (curr === "13:05") { curr = "14:15"; idx = 0; renderNav(); refresh(); calc(); }
-            else if(confirm("Zakończyć kurs?")) location.reload();
+            else exitApp();
         } else { idx = 1; refresh(); calc(); }
     }
 
