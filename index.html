@@ -3,210 +3,247 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>njob.png</title>
+    <title>njob</title>
 
     <link rel="icon" type="image/png" href="njob.png">
     <link rel="apple-touch-icon" href="njob.png">
-    <link rel="manifest" href='data:application/manifest+json,{"name":"APT","short_name":"APT","start_url":".","display":"standalone","background_color":"#000000","theme_color":"#000000"}'>
+    <link rel="manifest" href='data:application/manifest+json,{"name":"njob","short_name":"njob","start_url":".","display":"standalone","background_color":"#000000","theme_color":"#000000"}'>
 
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAMdnd3kjfS9rZJodhNclNPffa1Vn2DV5I&libraries=geometry,directions"></script>
 
     <style>
-        :root { --bg: #000; --card: #1e293b; --blue: #38bdf8; --green: #22c55e; --red: #ef4444; --gold: #fbbf24; }
+        :root { --bg: #000; --card: #1e293b; --blue: #1a73e8; --green: #1ed760; --red: #d93025; --gold: #fbc02d; }
         body { font-family: sans-serif; background: var(--bg); color: white; margin: 0; padding: 10px; display: flex; flex-direction: column; height: 100vh; box-sizing: border-box; overflow: hidden; position: relative; }
         
         #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        #splash h1 { color: #ddd; font-size: 3.2rem; font-weight: 900; margin-bottom: 50px; letter-spacing: 5px; background: #334155; padding: 20px 40px; border-radius: 20px; text-align: center; }
+        #splash img { width: 180px; height: auto; margin-bottom: 50px; border-radius: 20px; }
+        
         .btn-start { background: transparent; color: var(--blue); border: 3px solid var(--blue); padding: 20px 80px; border-radius: 50px; font-size: 1.8rem; font-weight: 900; cursor: pointer; }
 
         .btn-side { position: absolute; right: 15px; width: 44px; height: 44px; border: 2px solid white; border-radius: 50%; font-size: 24px; font-weight: bold; display: none; align-items: center; justify-content: center; z-index: 1000; cursor: pointer; }
-        #exit-btn { top: 15px; background: var(--red); color: white; }
-        #mute-btn { top: 70px; background: var(--blue); color: white; }
+        #exit-btn { top: 15px; background: var(--red); }
+        #mute-btn { top: 70px; background: var(--blue); }
 
-        .nav-label { font-size: 0.85rem; color: var(--blue); font-weight: 900; margin: 3px 0; text-transform: uppercase; letter-spacing: 1px; }
-        .nav-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; flex-shrink: 0; margin-right: 60px; }
+        .nav-label { font-size: 0.8rem; color: var(--blue); font-weight: 900; margin: 3px 0; text-transform: uppercase; }
+        .nav-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; flex-shrink: 0; margin-right: 60px; scroll-behavior: smooth; }
+        .nav-row::-webkit-scrollbar { display: none; }
         .btn-s { background: var(--card); color: #fff; border: 1px solid #444; padding: 10px 14px; border-radius: 8px; font-weight: bold; font-size: 0.9rem; min-width: 75px; white-space: nowrap; }
-        .btn-s.active { background: var(--blue); color: black; border-color: white; box-shadow: 0 0 12px var(--blue); }
+        .btn-s.active { background: var(--blue); color: white; border-color: white; box-shadow: 0 0 12px var(--blue); }
 
-        .display { background: var(--card); border: 2px solid #334155; border-radius: 20px; padding: 10px; text-align: center; margin-bottom: 8px; flex-shrink: 0; }
-        #stop-name { color: var(--blue); font-size: 1.1rem; font-weight: 900; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        
-        .timer-row { display: flex; align-items: center; justify-content: center; gap: 20px; margin: 5px 0; }
-        #timer { font-size: 2.8rem; font-weight: 900; color: var(--green); line-height: 1; }
-        .eta-container { display: flex; flex-direction: column; align-items: center; }
-        #gps-timer { font-size: 2rem; font-weight: 900; color: var(--blue); line-height: 1; opacity: 0.9; }
-        .eta-label { font-size: 0.55rem; color: #aaa; text-transform: lowercase; font-weight: bold; margin-top: 2px; }
+        .display { background: var(--card); border: 2px solid #334155; border-radius: 20px; padding: 12px; text-align: center; margin-bottom: 8px; flex-shrink: 0; overflow: hidden; }
+        #stop-name-container { width: 100%; display: flex; justify-content: center; align-items: center; white-space: nowrap; height: 60px; }
+        #stop-name { color: var(--blue); font-weight: 900; margin: 0; line-height: 1.1; letter-spacing: -1px; display: inline-block; }
 
-        #speed-panel { background: rgba(30, 41, 59, 0.9); border: 1px solid var(--gold); border-radius: 12px; padding: 5px; text-align: center; margin-bottom: 8px; flex-shrink: 0; transition: all 0.3s; }
-        #speed-val { font-size: 2.5rem; font-weight: 900; color: var(--gold); }
-        .speed-alarm { background: var(--red) !important; animation: blink 0.5s infinite; }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+        #timer-row { display: flex; align-items: center; justify-content: center; gap: 20px; margin: 5px 0; }
+        #timer { font-size: 3.4rem; font-weight: 900; color: var(--green); }
+        #eta-container { display: flex; flex-direction: column; align-items: center; background: rgba(0,0,0,0.3); padding: 5px 10px; border-radius: 10px; border: 1px solid #444; }
+        #eta-timer { font-size: 1.8rem; font-weight: 900; color: var(--blue); }
+        .eta-label { font-size: 0.65rem; color: #aaa; text-transform: uppercase; margin-bottom: 2px; font-weight: 900; }
 
-        #map-container { position: relative; flex: 1; width: 100%; margin-bottom: 12px; border: 2px solid #334155; border-radius: 15px; overflow: hidden; cursor: pointer; }
-        #map { width: 100%; height: 100%; pointer-events: none; } 
+        #gps-msg { font-weight: bold; font-size: 0.9rem; height: 1.2rem; margin-top: 5px; }
+
+        #instrument-row { display: flex; gap: 10px; margin-bottom: 8px; height: 65px; flex-shrink: 0; }
+        #speed-panel { flex: 1; background: rgba(30, 41, 59, 0.9); border: 1px solid var(--gold); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        #clock-panel { flex: 3; background: rgba(30, 41, 59, 0.9); border: 1px solid var(--blue); border-radius: 12px; display: flex; align-items: center; justify-content: center; position: relative; }
+        #speed-val { font-size: 1.8rem; font-weight: 900; color: var(--gold); }
+        #clock-val { font-size: 2.6rem; font-weight: 900; color: white; }
+
+        @keyframes blink-alarm { 0%, 100% { background: var(--card); } 50% { background: var(--red); } }
+        .alarm-active { animation: blink-alarm 0.5s infinite !important; }
+        @keyframes blink-late { 0% { background: var(--red); } 3% { background: rgba(30,41,59,0.9); } 6% { background: var(--red); } 9% { background: rgba(30,41,59,0.9); } 100% { background: rgba(30,41,59,0.9); } }
+        .late-warning { animation: blink-late 10s infinite; }
+
+        #map-container { position: relative; flex: 1; width: 100%; margin-bottom: 12px; border: 2px solid #334155; border-radius: 15px; overflow: hidden; }
+        #map { width: 100%; height: 100%; } 
         
         #nav-overlay { 
             position: absolute; top: 10px; left: 10px; z-index: 50;
-            background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(56, 189, 248, 0.5);
-            border-radius: 10px; padding: 6px 10px; max-width: 150px;
+            background: white; border-radius: 12px; padding: 8px 12px; 
+            min-width: 80px; box-shadow: 0 4px 15px rgba(0,0,0,0.6);
             display: none; flex-direction: column; align-items: center; justify-content: center;
-            text-align: center;
         }
-        #nav-icon-svg { width: 35px; height: 35px; margin-bottom: 2px; fill: white; }
-        #nav-dist { font-size: 1.1rem; font-weight: 900; color: white; }
-        #nav-street { font-size: 0.75rem; font-weight: bold; color: var(--blue); margin-top: 2px; line-height: 1.1; }
+        #nav-icon-svg { width: 55px; height: 55px; fill: var(--blue); }
+        #nav-dist { font-size: 1.5rem; font-weight: 900; color: #222; margin-top: -2px; }
 
         .footer { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; height: 65px; margin-bottom: 85px; flex-shrink: 0; }
-        .btn-nav { background: var(--card); color: white; border: 1px solid #444; border-radius: 12px; font-size: 1.1rem; font-weight: bold; text-transform: uppercase; }
-        #btn-next { color: var(--blue); border-color: var(--blue); }
+        .btn-nav { background: var(--card); color: var(--blue); border: 2px solid var(--blue); border-radius: 12px; font-size: 1.1rem; font-weight: bold; text-transform: uppercase; }
+        .btn-nav:active { background: var(--blue); color: black; }
     </style>
 </head>
-<body>
+<body onclick="forceFullScreen()">
 
     <div id="splash">
-        <h1>NOWE KRAMSKO</h1>
+        <img src="njob.png" alt="njob">
         <button class="btn-start" onclick="startApp()">START</button>
     </div>
 
     <button id="exit-btn" class="btn-side" onclick="exitApp()">×</button>
     <button id="mute-btn" class="btn-side" onclick="toggleMute()">🔈</button>
 
-    <div class="nav-label">🔵 DO MODIVO:</div>
+    <div class="nav-label">🔵 WYJAZDY:</div>
     <div id="work-bar" class="nav-row"></div>
-    <div class="nav-label">🔵 POWRÓT:</div>
+    <div class="nav-label">🔵 POWROTY:</div>
     <div id="return-bar" class="nav-row"></div>
 
     <div class="display">
-        <div id="stop-name">ŁADOWANIE...</div>
-        <div class="timer-row">
+        <div id="stop-name-container">
+            <div id="stop-name">CZEKAJ...</div>
+        </div>
+        <div id="timer-row">
             <div id="timer">--</div>
-            <div class="eta-container">
-                <div id="gps-timer">--:--</div>
-                <div class="eta-label">rzeczywisty czas dojazdu</div>
+            <div id="eta-container">
+                <span class="eta-label">Dojedziesz za</span>
+                <div id="eta-timer">--</div>
             </div>
         </div>
-        <div id="gps-msg" style="color:var(--gold); font-weight:bold; font-size:0.8rem; margin-top: 4px;"></div>
+        <div id="gps-msg"></div>
     </div>
 
-    <div id="speed-panel">
-        <span id="speed-val">0</span><span style="font-size:0.9rem; color:#aaa; margin-left:6px;">km/h</span>
-        <div id="road-info" style="font-size: 0.7rem; color: #38bdf8; font-weight: bold;"></div>
+    <div id="instrument-row">
+        <div id="speed-panel"><span id="speed-val">0</span><span style="font-size:0.6rem; color:#aaa; margin-left:2px;">km/h</span></div>
+        <div id="clock-panel"><span id="clock-val">00:00:00</span></div>
     </div>
 
-    <div id="map-container" onclick="openFullGoogleMaps(event)">
+    <div id="map-container" onclick="openFullGoogleMaps()">
         <div id="nav-overlay">
             <svg id="nav-icon-svg" viewBox="0 0 24 24"><path d=""/></svg>
             <div id="nav-dist">--- m</div>
-            <div id="nav-street">Czekam...</div>
         </div>
         <div id="map"></div>
     </div>
 
     <div class="footer">
-        <button class="btn-nav" onclick="move(-1)">Wstecz</button>
-        <button class="btn-nav" id="btn-next" onclick="handleStep()">Dalej</button>
+        <button class="btn-nav" onclick="move(-1)">Poprzedni</button>
+        <button class="btn-nav" onclick="handleStep()">Następny</button>
     </div>
 
 <script>
-    // TYLKO DWA PRZYSTANKI
-    const ptsW = [{ "n": "MODIVO", "la": 51.915056, "ln": 15.628250 }, { "n": "NOWE KRAMSKO", "la": 52.140361, "ln": 15.770278 }];
-    const ptsR = [{ "n": "NOWE KRAMSKO", "la": 52.140361, "ln": 15.770278 }, { "n": "MODIVO", "la": 51.915056, "ln": 15.628250 }];
+    const njobW = [
+        { "n": "NOWY KRAMSK", "la": 52.128333, "ln": 15.783611 },
+        { "n": "STARE KRAMSKO", "la": 52.138889, "ln": 15.748333 },
+        { "n": "WOJNOWO", "la": 52.179444, "ln": 15.753333 },
+        { "n": "BABIMOST", "la": 52.164167, "ln": 15.829444 },
+        { "n": "KOPANICA", "la": 52.125278, "ln": 15.876389 },
+        { "n": "SULECHÓW PCK", "la": 52.083333, "ln": 15.626194 },
+        { "n": "BRAMA 2", "la": 52.094611, "ln": 15.658056 }
+    ];
 
-    // GRAFIK - TYLKO TWOJE GODZINY
+    const njobR = [
+        { "n": "BRAMA 2", "la": 52.094611, "ln": 15.658056 },
+        { "n": "SULECHÓW PCK", "la": 52.083333, "ln": 15.626194 },
+        { "n": "KOPANICA", "la": 52.125278, "ln": 15.876389 },
+        { "n": "BABIMOST", "la": 52.164167, "ln": 15.829444 },
+        { "n": "WOJNOWO", "la": 52.179444, "ln": 15.753333 },
+        { "n": "STARE KRAMSKO", "la": 52.138889, "ln": 15.748333 },
+        { "n": "NOWY KRAMSK", "la": 52.128333, "ln": 15.783611 }
+    ];
+
     var schedules = {
-        "04:55": ptsR.map((s,i) => ({...s, t: i==0 ? "04:55" : "---"})),
-        "09:05": ptsR.map((s,i) => ({...s, t: i==0 ? "09:05" : "---"})),
-        "13:05": ptsR.map((s,i) => ({...s, t: i==0 ? "13:05" : "---"})),
-        "14:15": ptsW.map((s,i) => ({...s, t: i==0 ? "14:15" : "---"})),
-        "22:15": ptsW.map((s,i) => ({...s, t: i==0 ? "22:15" : "---"}))
+        "04:55": njobW.map((s,i) => ({...s, t: ["04:55","05:00","05:05","05:15","05:25","05:45","---"][i]})),
+        "09:05": njobW.map((s,i) => ({...s, t: ["09:05","09:10","09:15","09:25","09:35","09:55","---"][i]})),
+        "13:05": njobW.map((s,i) => ({...s, t: ["13:05","13:10","13:15","13:25","13:35","13:55","---"][i]})),
+        "14:15": njobR.map((s,i) => ({...s, t: i===0 ? "14:15" : "---"})),
+        "22:15": njobR.map((s,i) => ({...s, t: i===0 ? "22:15" : "---"}))
     };
 
-    var labels = { "04:55":"4:55", "09:05":"9:05", "13:05":"13:05", "14:15":"14:15", "22:15":"22:15" };
+    var labels = { "04:55": "4:55", "09:05": "9:05", "13:05": "13:05", "14:15": "14:15", "22:15": "22:15" };
+    var curr = "04:55", idx = 0, map, ds, dr, userPos, liveDelay = 0, userMarker, wakeLock = null, isMuted = false, currentNextManeuverLoc = null, lastApiCall = 0, catchupDone = false, currentKmh = 0, atStopIdx = -1, alarmPlayedForIdx = -1, audioCtx = null;
 
-    var curr = "04:55", idx = 0, map, ds, dr, userPos, liveDelay = 0, userMarker, wakeLock = null, lastApiCall = 0, currentNextManeuverLoc = null, catchupDone = false;
-    var isExpressway = false, lastVoiceAlert = 0, isMuted = false;
-    const iconPaths = { "straight": "M11,9L11,19L13,19L13,9L15.5,11.5L16.92,10.08L12,5.16L7.08,10.08L8.5,11.5L11,9Z", "turn-right": "M17,14L17,5L15,5L15,12L7,12L7,10L3,14L7,18L7,16L15,16C16.1,16 17,15.1 17,14Z", "turn-left": "M7,14L7,5L9,5L9,12L17,12L17,10L21,14L17,18L17,16L9,16C7.9,16 7,15.1 7,14Z", "roundabout": "M12,2A10,10 0 1,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 1,0 20,12A8,8 0 0,0 12,4M13,8V6H11V8H13M13,18V16H11V18H13M18,13H16V11H18V13M8,13H6V11H8V13Z" };
+    const iconPaths = { "straight": "M11,6.5V21H13V6.5L16.5,10L17.92,8.58L12,2.66L6.08,8.58L7.5,10L11,6.5Z", "turn-right": "M17,11.5L17,5L15,5L15,10L7,10L7,8L3,12L7,16L7,14L15,14C16.1,14 17,13.1 17,12V11.5Z", "turn-left": "M7,11.5L7,5L9,5L9,10L17,10L17,8L21,12L17,16L17,14L9,14C7.9,14 7,13.1 7,12V11.5Z", "roundabout": "M12,2C10.12,2 8.36,2.6 6.9,3.61L8.5,5.21C9.5,4.45 10.7,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20C7.59,20 4,16.41 4,12C4,10.7 4.45,9.5 5.21,8.5L3.61,6.9C2.6,8.36 2,10.12 2,12C2,17.5 6.5,22 12,22C17.5,22 22,17.5 22,12C22,6.5 17.5,2 12,2M12,7L7,12H11V16H13V12H17L12,7Z" };
 
-    window.addEventListener('click', () => {
-        if (!document.fullscreenElement && document.getElementById('splash').style.display === 'none') {
-            if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(()=>{});
-        }
-    });
-
+    function forceFullScreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{}); }
     async function requestWakeLock() { try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch (err) {} }
 
+    function playBeep(freq, dur) {
+        if(isMuted || !audioCtx) return;
+        const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.frequency.value = freq; gain.gain.value = 0.1;
+        osc.start(); setTimeout(() => osc.stop(), dur);
+    }
+
+    function scrollBarsToUpcoming() {
+        const rows = [document.getElementById('work-bar'), document.getElementById('return-bar')];
+        rows.forEach(row => { const act = row.querySelector('.active'); if(act) row.scrollTo({left: act.offsetLeft - 20, behavior: 'smooth'}); });
+    }
+
+    function adjustFontSize() {
+        const container = document.getElementById('stop-name-container');
+        const text = document.getElementById('stop-name');
+        let fontSize = 40;
+        text.style.fontSize = fontSize + "px";
+        while (text.offsetWidth < container.offsetWidth - 20 && fontSize < 65) { fontSize++; text.style.fontSize = fontSize + "px"; }
+        while (text.offsetWidth > container.offsetWidth - 10 && fontSize > 10) { fontSize--; text.style.fontSize = fontSize + "px"; }
+    }
+
     function startApp() {
-        autoSelect(); requestWakeLock();
+        if(typeof google === 'undefined') { alert("Błąd Map!"); return; }
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        autoSelectKurs(); requestWakeLock();
+        document.getElementById('splash').style.display = 'none';
         document.getElementById('exit-btn').style.display = 'flex';
         document.getElementById('mute-btn').style.display = 'flex';
         document.getElementById('nav-overlay').style.display = 'flex';
-        document.getElementById('splash').style.display = 'none';
-        renderNav(); initMap(); initGPS();
+        renderNav(); setTimeout(() => { scrollBarsToUpcoming(); adjustFontSize(); }, 400); 
+        initMap(); initGPS();
         calc(); setInterval(calc, 60000); setInterval(refresh, 1000);
+        setInterval(() => { const now = new Date(); document.getElementById('clock-val').innerText = now.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); }, 1000);
     }
 
     function initGPS() {
         if (navigator.geolocation) {
             navigator.geolocation.watchPosition(p => {
                 userPos = { lat: p.coords.latitude, lng: p.coords.longitude };
-                let kmh = (p.coords.speed && p.coords.speed > 0) ? Math.round(p.coords.speed * 3.6) : 0;
-                document.getElementById('speed-val').innerText = kmh;
-                handleSpeedAlerts(kmh);
-                if (map) {
+                currentKmh = (p.coords.speed && p.coords.speed > 0) ? Math.round(p.coords.speed * 3.6) : 0;
+                document.getElementById('speed-val').innerText = currentKmh;
+                if (map) { 
                     map.panTo(userPos);
-                    if (userMarker) userMarker.setPosition(userPos);
-                    else userMarker = new google.maps.Marker({ position: userPos, map: map, icon: { path: google.maps.SymbolPath.CIRCLE, scale: 9, fillColor: "#38bdf8", fillOpacity: 1, strokeColor: "white", strokeWeight: 2 } });
+                    if (p.coords.heading !== null) map.setHeading(p.coords.heading);
+                    const navArrow = { path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW, scale: 6, fillColor: "#1a73e8", fillOpacity: 1, strokeColor: "white", strokeWeight: 2, rotation: p.coords.heading || 0 };
+                    if (!userMarker) userMarker = new google.maps.Marker({ position: userPos, map: map, icon: navArrow, flat: true });
+                    else { userMarker.setPosition(userPos); userMarker.setIcon(navArrow); }
                 }
-                if (currentNextManeuverLoc && typeof google !== 'undefined') {
+                if (currentNextManeuverLoc) {
                     let d = google.maps.geometry.spherical.computeDistanceBetween(new google.maps.LatLng(userPos.lat, userPos.lng), currentNextManeuverLoc);
                     document.getElementById('nav-dist').innerText = d > 1000 ? (d/1000).toFixed(1) + " km" : Math.round(d) + " m";
-                    if (d < 30 && (Date.now() - lastApiCall > 10000)) calc();
+                    if (d < 150) { if (map.getZoom() < 20) map.setZoom(20); } else if (d > 250) { if (map.getZoom() > 18) map.setZoom(18); }
+                    if (d < 35 && (Date.now() - lastApiCall > 15000)) calc();
                 }
-                if (!catchupDone && typeof google !== 'undefined') { performCatchup(); catchupDone = true; }
+                if (!catchupDone) { performCatchup(); catchupDone = true; }
                 checkAutoArrival();
             }, null, { enableHighAccuracy: true });
         }
     }
 
-    function performCatchup() {
+    function openFullGoogleMaps() {
+        if (!userPos) return;
         let stops = schedules[curr];
-        for (let i = 0; i < stops.length - 1; i++) {
-            let d = google.maps.geometry.spherical.computeDistanceBetween(new google.maps.LatLng(userPos.lat, userPos.lng), new google.maps.LatLng(stops[i].la, stops[i].ln));
-            if (d < 450) { idx = i; calc(); refresh(); break; }
-        }
+        let dest = stops[stops.length-1].la + "," + stops[stops.length-1].ln;
+        let waypoints = stops.slice(idx, -1).map(s => s.la + "," + s.ln).join('|');
+        let url = `https://www.google.com/maps/dir/?api=1&origin=${userPos.lat},${userPos.lng}&destination=${dest}&waypoints=${encodeURIComponent(waypoints)}&travelmode=driving`;
+        window.open(url, "_blank");
     }
 
-    function handleSpeedAlerts(kmh) {
-        const panel = document.getElementById('speed-panel');
-        const limit80 = isExpressway ? 100 : 80;
-        const limit85 = isExpressway ? 105 : 85;
-        if (kmh > limit80) panel.classList.add('speed-alarm'); else panel.classList.remove('speed-alarm');
-        if (kmh > limit85) {
-            let now = Date.now();
-            if (now - lastVoiceAlert > 10000) { lastVoiceAlert = now; playBeep(); speak("Zwolnij"); }
-        }
-    }
+    function performCatchup() { let stops = schedules[curr]; for (let i = 0; i < stops.length - 1; i++) { let d = google.maps.geometry.spherical.computeDistanceBetween(new google.maps.LatLng(userPos.lat, userPos.lng), new google.maps.LatLng(stops[i].la, stops[i].ln)); if (d < 500) { idx = Math.min(i + 1, stops.length - 1); calc(); refresh(); break; } } }
+    function checkAutoArrival() { if(!userPos) return; let d = google.maps.geometry.spherical.computeDistanceBetween(new google.maps.LatLng(userPos.lat, userPos.lng), new google.maps.LatLng(schedules[curr][idx].la, schedules[curr][idx].ln)); if (d < 75 && idx < schedules[curr].length - 1) { atStopIdx = idx; idx++; calc(); refresh(); } }
 
-    function playBeep() { let ctx = new (window.AudioContext || window.webkitAudioContext)(); let osc = ctx.createOscillator(); osc.type = "sine"; osc.frequency.setValueAtTime(880, ctx.currentTime); osc.connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime + 0.3); }
-    function speak(text) { let msg = new SpeechSynthesisUtterance(text); msg.lang = 'pl-PL'; window.speechSynthesis.speak(msg); }
+    function initMap() {
+        const navStyle = [{ featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] }];
+        map = new google.maps.Map(document.getElementById("map"), { center: {lat: 52.12, lng: 15.78}, zoom: 18, tilt: 45, heading: 0, disableDefaultUI: true, styles: navStyle });
+        new google.maps.TrafficLayer().setMap(map);
+        ds = new google.maps.DirectionsService(); dr = new google.maps.DirectionsRenderer({ map: map, suppressMarkers: true, preserveViewport: true });
+    }
 
     function calc() {
         if(!userPos || !ds) return;
         lastApiCall = Date.now();
         ds.route({ origin: userPos, destination: {lat: schedules[curr][idx].la, lng: schedules[curr][idx].ln}, travelMode: google.maps.TravelMode.DRIVING }, (res, stat) => {
             if(stat === 'OK') { 
-                dr.setDirections(res); 
-                liveDelay = Math.round((res.routes[0].legs[0].duration.value / 60) * 1.16);
-                const step = res.routes[0].legs[0].steps[0];
-                currentNextManeuverLoc = step.end_location;
-                let instruction = step.instructions.replace(/<[^>]*>?/gm, '');
-                document.getElementById('nav-street').innerText = instruction;
-                const roadName = step.instructions.toLowerCase();
-                isExpressway = roadName.includes("s3") || roadName.includes("ekspresowa") || roadName.includes("autostrada");
-                document.getElementById('road-info').innerText = isExpressway ? "DROGA SZYBKIEGO RUCHU (LIMIT 100)" : "";
+                dr.setDirections(res); liveDelay = Math.round((res.routes[0].legs[0].duration.value / 60) * 1.15);
+                const step = res.routes[0].legs[0].steps[0]; currentNextManeuverLoc = step.end_location;
                 const man = (step.maneuver || "straight").toLowerCase();
                 let path = iconPaths["straight"];
-                if (man.includes("left")) path = iconPaths["turn-left"]; else if (man.includes("right")) path = iconPaths["turn-right"]; else if (man.includes("roundabout")) path = iconPaths["roundabout"];
+                if (man.includes("roundabout")) path = iconPaths["roundabout"]; else if (man.includes("left")) path = iconPaths["turn-left"]; else if (man.includes("right")) path = iconPaths["turn-right"];
                 document.getElementById('nav-icon-svg').querySelector('path').setAttribute('d', path);
             }
         });
@@ -214,19 +251,38 @@
 
     function refresh() {
         let s = schedules[curr][idx];
-        document.getElementById('stop-name').innerText = (idx+1) + "/" + schedules[curr].length + " " + s.n;
-        let tEl = document.getElementById('timer'); let gtEl = document.getElementById('gps-timer');
-        let msgEl = document.getElementById('gps-msg');
-        let etaDate = new Date(); etaDate.setMinutes(etaDate.getMinutes() + liveDelay);
-        gtEl.innerText = etaDate.getHours() + ":" + (etaDate.getMinutes()<10?'0':'') + etaDate.getMinutes();
+        const stopNameEl = document.getElementById('stop-name');
+        const timePart = s.t !== "---" ? "(" + s.t + ") " : "";
+        const newStopText = timePart + s.n;
+        if (stopNameEl.innerText !== newStopText) { stopNameEl.innerText = newStopText; adjustFontSize(); }
+        let tEl = document.getElementById('timer'); let etaEl = document.getElementById('eta-timer'); let clockPanel = document.getElementById('clock-panel'); let gpsMsgEl = document.getElementById('gps-msg');
+        etaEl.innerText = liveDelay > 0 ? liveDelay + "m" : "--";
+        let diff = 0;
         if(s.t === "---") {
-            tEl.innerText = liveDelay + " min"; tEl.style.color = "var(--blue)"; msgEl.innerText = "";
+            let n = new Date(); n.setMinutes(n.getMinutes() + liveDelay);
+            tEl.innerText = n.getHours() + ":" + (n.getMinutes()<10?'0':'') + n.getMinutes();
+            tEl.style.color = "var(--blue)"; gpsMsgEl.innerText = "";
         } else {
             let p = s.t.split(':'); let tr = new Date(); tr.setHours(p[0], p[1], 0);
-            let diff = Math.ceil((tr - new Date()) / 60000); if (diff < 0) diff += 1440;
+            diff = Math.ceil((tr - new Date()) / 60000); if (diff < -90) diff += 1440;
             tEl.innerText = diff < 60 ? diff + " min" : Math.floor(diff/60)+"h "+(diff%60)+"m";
-            tEl.style.color = "var(--green)"; msgEl.innerText = "ZAPAS: " + (diff - liveDelay) + " min";
+            tEl.style.color = (diff < 0) ? "var(--red)" : "var(--green)";
+            const delta = diff - liveDelay;
+            let statusText = (delta >= 0) ? "ZAPAS CZASU: " + delta + " min" : "SPÓŹNIENIE: " + Math.abs(delta) + " min";
+            gpsMsgEl.style.color = (delta >= 0) ? "var(--gold)" : "var(--red)";
+            if (gpsMsgEl.innerText !== statusText) gpsMsgEl.innerText = statusText;
         }
+        clockPanel.classList.remove('alarm-active'); clockPanel.classList.remove('late-warning');
+        if (currentKmh > 10) { atStopIdx = -1; alarmPlayedForIdx = -1; }
+        let isAlarming = false;
+        if (atStopIdx !== -1) {
+            let stop = schedules[curr][atStopIdx];
+            if (stop && stop.t !== "---") {
+                let p = stop.t.split(':'); let depTime = new Date(); depTime.setHours(p[0], p[1], 0);
+                if (new Date() >= depTime && currentKmh < 5) { clockPanel.classList.add('alarm-active'); isAlarming = true; if (alarmPlayedForIdx !== atStopIdx) { playBeep(920, 2000); alarmPlayedForIdx = atStopIdx; } }
+            }
+        }
+        if (!isAlarming && (diff - liveDelay) < 0 && s.t !== "---") { clockPanel.classList.add('late-warning'); }
     }
 
     function renderNav() {
@@ -234,39 +290,22 @@
         w.innerHTML = ""; r.innerHTML = "";
         for(let k in schedules) {
             let b = document.createElement('button'); b.className = 'btn-s' + (k === curr ? ' active' : '');
-            b.innerText = labels[k] || k;
-            b.onclick = (e) => { e.stopPropagation(); curr = k; idx = 0; catchupDone = false; renderNav(); calc(); };
-            if (["04:55", "09:05", "13:05"].includes(k)) w.appendChild(b); else r.appendChild(b);
+            b.innerText = labels[k] || k; b.setAttribute('data-time', k);
+            b.onclick = (e) => { e.stopPropagation(); curr = k; idx = 0; atStopIdx = -1; alarmPlayedForIdx = -1; catchupDone = false; renderNav(); calc(); };
+            if (["14:15", "22:15"].includes(k)) r.appendChild(b); else w.appendChild(b);
         }
     }
 
-    function handleStep() {
-        if (idx >= schedules[curr].length - 1) {
-            if (curr === "13:05") {
-                curr = "14:15"; idx = 0; catchupDone = false; renderNav(); calc(); refresh();
-            } else { exitApp(); }
-        } else { idx++; calc(); }
-    }
-
-    function checkAutoArrival() {
-        if(!userPos || typeof google === 'undefined') return;
-        let d = google.maps.geometry.spherical.computeDistanceBetween(new google.maps.LatLng(userPos.lat, userPos.lng), new google.maps.LatLng(schedules[curr][idx].la, schedules[curr][idx].ln));
-        if (d < 75) { handleStep(); refresh(); }
-    }
-
-    function autoSelect() {
-        const now = new Date(); const min = now.getHours() * 60 + now.getMinutes();
-        let f = "04:55"; const keys = Object.keys(labels);
-        for (let k of keys) { const [h,m] = k.split(':').map(Number); const sMin = h*60+m; if (min >= sMin && min <= sMin + 90) { f = k; break; } if (sMin > min) { f = k; break; } }
-        curr = f;
-    }
-
-    function openFullGoogleMaps(e) { e.stopPropagation(); if (!userPos) return; let stops = schedules[curr]; let dest = stops[stops.length - 1].la + "," + stops[stops.length - 1].ln; let waypoints = []; for (let i = idx; i < stops.length - 1; i++) waypoints.push(stops[i].la + "," + stops[i].ln); let wpString = waypoints.length > 0 ? "&waypoints=" + encodeURIComponent(waypoints.join('|')) : ""; window.open("https://www.google.com/maps/dir/?api=1&origin=" + userPos.lat + "," + userPos.lng + "&destination=" + dest + wpString + "&travelmode=driving", "_blank"); }
-    function initMap() { if(typeof google === 'undefined') return; map = new google.maps.Map(document.getElementById("map"), { center: {lat: 51.93, lng: 15.50}, zoom: 16, mapTypeId: 'roadmap', disableDefaultUI: true, gestureHandling: 'none' }); new google.maps.TrafficLayer().setMap(map); ds = new google.maps.DirectionsService(); dr = new google.maps.DirectionsRenderer({ map: map, suppressMarkers: true }); }
     function toggleMute() { isMuted = !isMuted; document.getElementById('mute-btn').innerText = isMuted ? "🔇" : "🔈"; }
     function exitApp() { if(confirm("Zakończyć?")) location.reload(); }
-    function move(d) { if(schedules[curr][idx + d]) { idx += d; calc(); } }
+    function move(d) { if(schedules[curr] && schedules[curr][idx + d]) { idx += d; atStopIdx = -1; alarmPlayedForIdx = -1; calc(); } }
+    function handleStep() { if (idx >= (schedules[curr]?.length || 0) - 1) exitApp(); else { idx++; atStopIdx = -1; alarmPlayedForIdx = -1; calc(); } }
+    function autoSelectKurs() {
+        const now = new Date(); const minNow = now.getHours() * 60 + now.getMinutes();
+        const keys = Object.keys(labels).sort(); let selected = keys[0];
+        for (let k of keys) { const [h, m] = k.split(':').map(Number); if (minNow < (h * 60 + m) + 90) { selected = k; break; } }
+        curr = selected;
+    }
 </script>
 </body>
-
 </html>
