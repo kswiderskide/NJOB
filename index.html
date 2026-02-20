@@ -69,6 +69,7 @@
         .btn-nav { background: var(--card); color: var(--blue); border: 2px solid var(--blue); border-radius: 12px; font-size: 1.1rem; font-weight: bold; text-transform: uppercase; transition: 0.3s; }
         .btn-nav:active { background: var(--blue); color: black; }
         
+        /* Styl dla czerwonego przycisku ZAKOŃCZ */
         .btn-finish { background: var(--red) !important; color: white !important; border-color: white !important; box-shadow: 0 0 15px var(--red); }
     </style>
 </head>
@@ -226,7 +227,7 @@
     }
 
     function triggerNextKurs() {
-        if (curr === "13:05") { curr = "14:15"; idx = 0; } 
+        if (curr === "13:05") { curr = "14:15"; idx = 0; specialTarget = null; } 
         else { specialTarget = locCRS; }
         atStopIdx = -1; alarmPlayedForIdx = -1; catchupDone = false;
         renderNav(); calc(); refresh(); scrollBarsToUpcoming();
@@ -263,7 +264,8 @@
         const newStopText = timePart + s.n;
         if (stopNameEl.innerText !== newStopText) { stopNameEl.innerText = newStopText; adjustFontSize(); }
         
-        if (specialTarget || idx >= (schedules[curr]?.length || 0) - 1) {
+        // POPRAWIONA LOGIKA PRZYCISKU: Tylko przy zjeździe na CRS jest czerwony ZAKOŃCZ
+        if (specialTarget) {
             nextBtn.innerText = "ZAKOŃCZ"; nextBtn.classList.add('btn-finish');
         } else {
             nextBtn.innerText = "NASTĘPNY"; nextBtn.classList.remove('btn-finish');
