@@ -66,8 +66,10 @@
         #nav-dist { font-size: 1.5rem; font-weight: 900; color: #222; margin-top: -2px; }
 
         .footer { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; height: 65px; margin-bottom: 85px; flex-shrink: 0; }
-        .btn-nav { background: var(--card); color: var(--blue); border: 2px solid var(--blue); border-radius: 12px; font-size: 1.1rem; font-weight: bold; text-transform: uppercase; }
+        .btn-nav { background: var(--card); color: var(--blue); border: 2px solid var(--blue); border-radius: 12px; font-size: 1.1rem; font-weight: bold; text-transform: uppercase; transition: 0.3s; }
         .btn-nav:active { background: var(--blue); color: black; }
+        
+        .btn-finish { background: var(--red) !important; color: white !important; border-color: white !important; box-shadow: 0 0 15px var(--red); }
     </style>
 </head>
 <body onclick="forceFullScreen()">
@@ -104,7 +106,7 @@
         <div id="clock-panel"><span id="clock-val">00:00:00</span></div>
     </div>
 
-    <div id="map-container" onclick="openFullGoogleMaps()">
+    <div id="map-container">
         <div id="nav-overlay">
             <svg id="nav-icon-svg" viewBox="0 0 24 24"><path d=""/></svg>
             <div id="nav-dist">--- m</div>
@@ -114,16 +116,14 @@
 
     <div class="footer">
         <button class="btn-nav" onclick="move(-1)">Poprzedni</button>
-        <button class="btn-nav" onclick="handleStep()">Następny</button>
+        <button id="next-btn" class="btn-nav" onclick="handleStep()">Następny</button>
     </div>
 
 <script>
-    // PRECYZYJNE KOORDYNATY OD CIEBIE
     const locNK = { "n": "NOWE KRAMSKO", "la": 52.140361, "ln": 15.770278 };
     const locMOD = { "n": "MODIVO", "la": 51.915056, "ln": 15.628250 };
     const locCRS = { "n": "ZJAZD: PARKING CRS", "la": 51.956111, "ln": 15.528250 };
 
-    // TYLKO TRZY PUNKTY W CAŁYM SYSTEMIE
     const njobW = [locNK, locMOD];
     const njobR = [locMOD, locNK];
 
@@ -136,7 +136,7 @@
     };
 
     var labels = { "04:55": "4:55", "09:05": "9:05", "13:05": "13:05", "14:15": "14:15", "22:15": "22:15" };
-    var curr = "04:55", idx = 0, map, ds, dr, userPos, liveDelay = 0, userMarker, wakeLock = null, isMuted = false, currentNextManeuverLoc = null, lastApiCall = 0, catchupDone = false, currentKmh = 0, atStopIdx = -1, alarmPlayedForIdx = -1, audioCtx = null, specialTarget = null;
+    var curr = "04:55", idx = 0, map, ds, dr, userPos, liveDelay = 0, userMarker, wakeLock = null, isMuted = false, currentNextManeuverLoc = null, lastApiCall = 0, catchupDone = false, currentKmh = 0, atStopIdx = -1, alarmPlayedForIdx = -1, audioCtx = null, specialTarget = null, lastTap = 0;
 
     const iconPaths = { "straight": "M11,6.5V21H13V6.5L16.5,10L17.92,8.58L12,2.66L6.08,8.58L7.5,10L11,6.5Z", "turn-right": "M17,11.5L17,5L15,5L15,10L7,10L7,8L3,12L7,16L7,14L15,14C16.1,14 17,13.1 17,12V11.5Z", "turn-left": "M7,11.5L7,5L9,5L9,10L17,10L17,8L21,12L17,16L17,14L9,14C7.9,14 7,13.1 7,12V11.5Z", "roundabout": "M12,2C10.12,2 8.36,2.6 6.9,3.61L8.5,5.21C9.5,4.45 10.7,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20C7.59,20 4,16.41 4,12C4,10.7 4.45,9.5 5.21,8.5L3.61,6.9C2.6,8.36 2,10.12 2,12C2,17.5 6.5,22 12,22C17.5,22 22,17.5 22,12C22,6.5 17.5,2 12,2M12,7L7,12H11V16H13V12H17L12,7Z" };
 
@@ -149,11 +149,6 @@
         osc.connect(gain); gain.connect(audioCtx.destination);
         osc.frequency.value = freq; gain.gain.value = 0.1;
         osc.start(); setTimeout(() => osc.stop(), dur);
-    }
-
-    function scrollBarsToUpcoming() {
-        const rows = [document.getElementById('work-bar'), document.getElementById('return-bar')];
-        rows.forEach(row => { const act = row.querySelector('.active'); if(act) row.scrollTo({left: act.offsetLeft - 20, behavior: 'smooth'}); });
     }
 
     function adjustFontSize() {
@@ -172,6 +167,13 @@
         document.getElementById('exit-btn').style.display = 'flex';
         document.getElementById('mute-btn').style.display = 'flex';
         document.getElementById('nav-overlay').style.display = 'flex';
+        
+        document.getElementById('map-container').addEventListener('touchstart', (e) => {
+            let now = Date.now();
+            if (now - lastTap < 350) openFullGoogleMaps();
+            lastTap = now;
+        });
+
         renderNav(); setTimeout(() => { scrollBarsToUpcoming(); adjustFontSize(); }, 400); 
         initMap(); initGPS();
         calc(); setInterval(calc, 60000); setInterval(refresh, 1000);
@@ -206,7 +208,7 @@
     function openFullGoogleMaps() {
         if (!userPos) return;
         let dest = specialTarget ? specialTarget.la + "," + specialTarget.ln : schedules[curr][idx].la + "," + schedules[curr][idx].ln;
-        let url = `http://googleusercontent.com/maps.google.com/maps?saddr=${userPos.lat},${userPos.lng}&daddr=${dest}&directionsmode=driving`;
+        let url = `https://www.google.com/maps/dir/?api=1&origin=${userPos.lat},${userPos.lng}&destination=${dest}&travelmode=driving`;
         window.open(url, "_blank");
     }
 
@@ -256,9 +258,17 @@
     function refresh() {
         let s = specialTarget ? specialTarget : schedules[curr][idx];
         const stopNameEl = document.getElementById('stop-name');
+        const nextBtn = document.getElementById('next-btn');
         const timePart = (s.t && s.t !== "---") ? "(" + s.t + ") " : "";
         const newStopText = timePart + s.n;
         if (stopNameEl.innerText !== newStopText) { stopNameEl.innerText = newStopText; adjustFontSize(); }
+        
+        if (specialTarget || idx >= (schedules[curr]?.length || 0) - 1) {
+            nextBtn.innerText = "ZAKOŃCZ"; nextBtn.classList.add('btn-finish');
+        } else {
+            nextBtn.innerText = "NASTĘPNY"; nextBtn.classList.remove('btn-finish');
+        }
+
         let tEl = document.getElementById('timer'); let etaEl = document.getElementById('eta-timer'); let clockPanel = document.getElementById('clock-panel'); let gpsMsgEl = document.getElementById('gps-msg');
         etaEl.innerText = liveDelay > 0 ? liveDelay + "m" : "--";
         let diff = 0;
@@ -286,6 +296,11 @@
             }
         }
         if (!clockPanel.classList.contains('alarm-active') && (diff - liveDelay) < 0 && s.t && s.t !== "---") { clockPanel.classList.add('late-warning'); }
+    }
+
+    function scrollBarsToUpcoming() {
+        const rows = [document.getElementById('work-bar'), document.getElementById('return-bar')];
+        rows.forEach(row => { const act = row.querySelector('.active'); if(act) row.scrollTo({left: act.offsetLeft - 20, behavior: 'smooth'}); });
     }
 
     function renderNav() {
